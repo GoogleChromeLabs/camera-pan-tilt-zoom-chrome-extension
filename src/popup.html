@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    body {
+      margin: 2px;
+    }
+    button {
+      background-color: rgb(239, 239, 239);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 32px;
+      width: 48px;
+      height: 48px;
+      border: 0;
+      margin-bottom: 2px;
+      display: block;
+    }
+    button:active {
+      background-color: rgb(239, 239, 239, 0.3);
+    }
+    @media (prefers-color-scheme: dark) {
+      button {
+        background-color: #ccc;
+        filter: invert(100%);
+      }
+    }
+    #zoomInButton {
+      background-image: url('assets/zoom_in-24px.svg');
+    }
+    #zoomOutButton {
+      background-image: url('assets/zoom_out-24px.svg');
+    }
+    #panLeftButton {
+      background-image: url('assets/chevron_left-24px.svg');
+    }
+    #panRightButton {
+      background-image: url('assets/chevron_right-24px.svg');
+    }
+    #tiltUpButton {
+      background-image: url('assets/expand_less-24px.svg');
+    }
+    #tiltDownButton {
+      background-image: url('assets/expand_more-24px.svg');
+    }
+  </style>
+  <body>
+    <button id="zoomInButton" title="Zoom in" data-command="zoomIn"></button>
+    <button id="zoomOutButton" title="Zoom out" data-command="zoomOut"></button>
+    <button id="panLeftButton" title="Pan left" data-command="panLeft"></button>
+    <button id="panRightButton" title="Pan right" data-command="panRight"></button>
+    <button id="tiltUpButton" title="Tilt up" data-command="tiltUp"></button>
+    <button id="tiltDownButton" title="Tilt down" data-command="tiltDown"></button>
+    <script src="popup.js"></script>
+  </body>
+</html>
