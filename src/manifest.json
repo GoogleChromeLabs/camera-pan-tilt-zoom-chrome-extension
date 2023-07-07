@@ -1,15 +1,12 @@
 {
    "name": "Camera Pan Tilt Zoom",
    "description": "Control camera pan, tilt, and zoom",
-   "version": "1.6",
+   "version": "1.7",
    "icons": {
      "128": "assets/icon128.png"
    },
    "background": {
-     "persistent": false,
-     "scripts": [
-       "background.js"
-     ]
+     "service_worker": "background.js"
    },
    "commands": {
      "zoomIn": {
@@ -33,22 +30,16 @@
        "description": "Tilt down"
      }
    },
-   "browser_action": {
+   "action": {
      "default_popup": "popup.html",
      "default_icon": {
        "19": "assets/icon19.png",
        "38": "assets/icon38.png"
      }
    },
-   "options_ui": {
-     "page": "options.html",
-     "open_in_tab": false
-   },
-   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
    "permissions": [
-     "activeTab",
-     "storage"
+     "scripting",
+     "activeTab"
    ],
-   "minimum_chrome_version": "87",
-   "manifest_version": 2
+   "manifest_version": 3
  }

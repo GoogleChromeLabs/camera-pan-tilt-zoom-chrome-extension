@@ -13,44 +13,44 @@
 // limitations under the License.
 
 
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-184603774-1']);
-
-function code(ptz, multiplier) {
-  return `(async () => {
-    // Prompt user to allow website to control camera PTZ if needed.
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { pan: true, tilt: true, zoom: true },
-    });
-    const [videoTrack] = stream.getVideoTracks();
-    if (("${ptz}" in videoTrack.getSettings())) {
-      const range = videoTrack.getCapabilities().${ptz};
-      const granularity = 6;
-      const step = Math.max(range.step, (range.max - range.min) / granularity);
-      const value = Math.max(range.min, Math.min(range.max,
-        videoTrack.getSettings().${ptz} + step * ${multiplier}));
-      videoTrack.applyConstraints({ advanced: [{ ${ptz} : value }] });
-    } else {
-      alert("Your camera doesn't support ${ptz}. Sorry!");
-    }
-    // Stop tracks.
-    stream.getTracks().forEach(track => track.stop());
-  })();`;
+async function code(ptz, multiplier) {
+  // Prompt user to allow website to control camera PTZ if needed.
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { pan: true, tilt: true, zoom: true },
+  });
+  const [videoTrack] = stream.getVideoTracks();
+  if (ptz in videoTrack.getSettings()) {
+    const range = videoTrack.getCapabilities()[ptz];
+    const granularity = 6;
+    const step = Math.max(range.step, (range.max - range.min) / granularity);
+    const value = Math.max(range.min, Math.min(range.max,
+      videoTrack.getSettings()[ptz] + step * multiplier));
+    await videoTrack.applyConstraints({ advanced: [{ [ptz] : value }] });
+  } else {
+    alert(`Your camera doesn't support ${ptz}. Sorry!`);
+  }
+  // Stop tracks.
+  stream.getTracks().forEach(track => track.stop());
 }
 
 const commands = {
-  zoomIn: code("zoom", 1),
-  zoomOut: code("zoom", -1),
-  panRight: code("pan", 1),
-  panLeft: code("pan", -1),
-  tiltUp: code("tilt", 1),
-  tiltDown: code("tilt", -1)
+  zoomIn: ["zoom", 1],
+  zoomOut: ["zoom", -1],
+  panRight: ["pan", 1],
+  panLeft: ["pan", -1],
+  tiltUp: ["tilt", 1],
+  tiltDown: ["tilt", -1],
 };
 
-function executeScript(command) {
+async function executeScript(command) {
   if (!(command in commands)) return;
-  chrome.tabs.executeScript({ code: commands[command] });
-  _gaq.push(["_trackEvent", 'command', command]);
+  const [tab] = await chrome.tabs.query({ active: true });
+  const scriptInjection = {
+    target: { tabId: tab.id },
+    func: code,
+    args: commands[command],
+  }
+  chrome.scripting.executeScript(scriptInjection);
 }
 
 chrome.runtime.onMessage.addListener(({command}) => {
@@ -59,12 +59,4 @@ chrome.runtime.onMessage.addListener(({command}) => {
 
 chrome.commands.onCommand.addListener((command) => {
   executeScript(command);
-});
-
-chrome.storage.sync.get({ sendUsageStatistics: true }, ({sendUsageStatistics}) => {
-  if (!sendUsageStatistics) return;
-
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = 'https://ssl.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 });
